@@ -22,6 +22,9 @@ export default function FaceDetectionPage() {
     recognized: 0,
     unknown: 0,
   });
+  
+  // Debug state for UI screenshots
+  const [debugMode, setDebugMode] = useState(false);
 
   // Load models and registered faces on mount
   useEffect(() => {
@@ -93,6 +96,22 @@ export default function FaceDetectionPage() {
     []
   );
 
+  // Debug handlers for UI screenshots
+  const setModelReady = useCallback(() => {
+    setModelsLoaded(true);
+    setModelError(null);
+  }, []);
+
+  const setModelLoading = useCallback(() => {
+    setModelsLoaded(false);
+    setModelError(null);
+  }, []);
+
+  const setModelErrorState = useCallback(() => {
+    setModelsLoaded(false);
+    setModelError("Failed to load face detection models. Please ensure model files are in /public/models/");
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Main Content */}
@@ -151,6 +170,50 @@ export default function FaceDetectionPage() {
             />
           </div>
         </div>
+
+        {/* Debug Panel for UI Screenshots */}
+        {debugMode && (
+          <div className="fixed bottom-4 right-4 bg-card border rounded-lg shadow-lg p-4 space-y-3 z-50">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Debug Controls</span>
+              <button
+                onClick={() => setDebugMode(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-2">
+              <button
+                onClick={setModelReady}
+                className="w-full px-3 py-2 text-sm bg-green-500/10 text-green-600 rounded hover:bg-green-500/20 transition-colors"
+              >
+                Set Model Ready
+              </button>
+              <button
+                onClick={setModelLoading}
+                className="w-full px-3 py-2 text-sm bg-muted text-muted-foreground rounded hover:bg-muted/80 transition-colors"
+              >
+                Set Model Loading
+              </button>
+              <button
+                onClick={setModelErrorState}
+                className="w-full px-3 py-2 text-sm bg-red-500/10 text-red-600 rounded hover:bg-red-500/20 transition-colors"
+              >
+                Set Model Error
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Debug Toggle Button */}
+        <button
+          onClick={() => setDebugMode(!debugMode)}
+          className="fixed bottom-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs z-50"
+          style={{ display: debugMode ? 'none' : 'block' }}
+        >
+          Debug
+        </button>
       </main>
     </div>
   );
